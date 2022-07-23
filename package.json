@@ -20,5 +20,13 @@
   },
   "devDependencies": {
     "nodemon": "^2.0.19"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/choirulafiq30/mern-tutorial.git"
+  },
+  "bugs": {
+    "url": "https://github.com/choirulafiq30/mern-tutorial/issues"
+  },
+  "homepage": "https://github.com/choirulafiq30/mern-tutorial#readme"
 }
