@@ -1,6 +1,7 @@
-const bcrypt = require("bcryptjs")
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
 const asyncHandler = require("express-async-handler");
-const loginUser = require("../models/userModel");
+const User = require("../models/userModel");
 
 // @desc    Register user
 // @route   POST /api/users
@@ -36,10 +37,11 @@ const registerUser = asyncHandler(async (req, res) => {
       _id: user.id,
       name: user.name,
       email: user.email,
-    })
+      token: generateToken(user.id),
+    });
   } else {
     res.status(400);
-    throw Error("Invalid user data")
+    throw Error("Invalid user data");
   }
 });
 
@@ -47,23 +49,23 @@ const registerUser = asyncHandler(async (req, res) => {
 // @route   POST /api/users/login
 // @access  Public
 const loginUser = asyncHandler(async (req, res) => {
-  const { email, password } = req.body
+  const { email, password } = req.body;
 
   //check for user email
-const user = await User.findOne({ email })
+  const user = await User.findOne({ email });
 
-if (user && (await bcrypt.compare(password, user.password))) {
+  if (user && (await bcrypt.compare(password, user.password))) {
     res.json({
-        _id: user.id,
-        name: user.name,
-        email: user.email,
-
-    })
-} else {
-    res.status(400)
+      _id: user.id,
+      name: user.name,
+      email: user.email,
+      token: generateToken(user._id),
+    });
+  } else {
+    res.status(400);
     throw Error("Invalid credentials");
   }
-})
+});
 
 // @desc    Get user data
 // @route   GET /api/users/me
@@ -76,7 +78,14 @@ const getMe = asyncHandler(async (req, res) => {
     name,
     email,
   });
-})
+});
+
+//generate JWT
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: "30d",
+  });
+};
 
 module.exports = {
   registerUser,
